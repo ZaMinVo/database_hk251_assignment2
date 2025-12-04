@@ -174,27 +174,6 @@ INSERT INTO SanPhamThuocVao (MaSanPham, MaShop, MaThuongHieu, MaDanhMuc) VALUES
 (1, 10, 10, 10),
 (2, 10, 10, 10);
 
--- Đánh giá sản phẩm
-INSERT INTO DanhGia (CCCD, MaSanPham, MaShop, Diem, NoiDung, Ngay, Thang, Nam) VALUES
-('567890123456', 1, 1, 5, 'Sản phẩm chất lượng, giao nhanh', 15, 11, 2025),
-('678901234567', 2, 1, 4, 'Áo vừa vặn, màu đẹp', 16, 11, 2025),
-('789012345678', 3, 1, 3, 'Chất lượng trung bình', 17, 11, 2025),
-('890123456789', 4, 1, 5, 'Rất hài lòng, sẽ mua lại', 18, 11, 2025),
-('901234567890', 5, 1, 4, 'Sản phẩm tốt, nhưng đóng gói chưa đẹp', 19, 11, 2025);
-
--- Đánh giá sản phẩm bổ sung
-INSERT INTO DanhGia (CCCD, MaSanPham, MaShop, Diem, NoiDung, Ngay, Thang, Nam) VALUES
-('666666666666', 1, 6, 5, 'Áo thoáng mát, dễ vận động', 20, 11, 2025),
-('777777777777', 2, 6, 4, 'Quần form ổn, màu đẹp', 21, 11, 2025),
-('888888888888', 1, 7, 5, 'Giày chạy êm chân', 22, 11, 2025),
-('999999999999', 2, 7, 4, 'Áo khoác nhẹ, chống gió tốt', 23, 11, 2025),
-('101010101010', 1, 8, 4, 'Vải mát, mặc ngủ thoải mái', 24, 11, 2025),
-('666666666666', 2, 8, 3, 'Bikini vừa vặn, giao nhanh', 25, 11, 2025),
-('777777777777', 1, 9, 5, 'Áo bra ôm tốt, giá ổn', 26, 11, 2025),
-('888888888888', 2, 9, 4, 'Leggings co giãn ok', 27, 11, 2025),
-('999999999999', 1, 10, 5, 'Vòng tay đẹp, sáng bóng', 28, 11, 2025),
-('101010101010', 2, 10, 4, 'Dây chuyền tinh xảo', 29, 11, 2025);
-
 -- Hồ sơ liên lạc (địa chỉ nhận hàng)
 INSERT INTO HoSoLienLac (CCCD, MaHoSo, Ten, SDT, DiaChi) VALUES
 ('567890123456', 1, 'Nguyen Thi F - Nhà', '0956789012', '123 Đường A, Quận 1, TP.HCM'),
@@ -346,19 +325,6 @@ INSERT INTO ApDungVoucher (MaDonHang, MaVoucher) VALUES
 (27, 14),
 (30, 15);
 
--- Yêu cầu đổi trả
-INSERT INTO YeuCauDoiTra (CCCD, MaDonHang, LyDoDoiTra, Ngay, Thang, Nam, TrangThai) VALUES
-('567890123456', 12, 'Sản phẩm bị lỗi', 20, 11, 2025, 'Chờ xác nhận'),
-('678901234567', 14, 'Giao nhầm màu', 21, 11, 2025, 'Chờ xác nhận'),
-('678901234567', 15, 'Kích thước không vừa', 22, 11, 2025, 'Chờ xác nhận'),
-('789012345678', 17, 'Không đúng mô tả', 23, 11, 2025, 'Chờ xác nhận'),
-('901234567890', 21, 'Hàng bị hư hỏng', 24, 11, 2025, 'Chờ xác nhận'),
-('666666666666', 24, 'Đóng gói móp méo', 26, 11, 2025, 'Chờ xác nhận'),
-('777777777777', 26, 'Giao chậm', 27, 11, 2025, 'Chờ xác nhận'),
-('888888888888', 28, 'Sai size', 28, 11, 2025, 'Chờ xác nhận'),
-('999999999999', 30, 'Sản phẩm trầy xước', 29, 11, 2025, 'Chờ xác nhận'),
-('101010101010', 32, 'Không giống hình', 30, 11, 2025, 'Chờ xác nhận');
-
 -- Thanh toán
 INSERT INTO ThanhToan (MaThanhToan, PhuongThucThanhToan, MoTa, MaDonHang, Ngay, Gio, Thang, Nam) VALUES
 (1, 'Tiền mặt', 'Thanh toán tại nhà', 12, 20, 14, 11, 2025),
@@ -405,3 +371,25 @@ INSERT INTO TheoDoi (FollowerCCCD, FollowedCCCD) VALUES
 ('333333333333', '888888888888'),
 ('444444444444', '999999999999'),
 ('555555555555', '101010101010');
+
+
+-- Cập nhật trạng thái đơn hàng thành 'Đã nhận được hàng'
+UPDATE DonHang
+SET TrangThaiDonHang = 'Đã nhận được hàng'
+WHERE MaDonHang IN (12, 13, 14, 15, 16);
+
+-- Đánh giá sản phẩm
+INSERT INTO DanhGia (CCCD, MaSanPham, MaShop, Diem, NoiDung, Ngay, Thang, Nam) VALUES
+('567890123456', 1, 1, 5, 'Sản phẩm tốt, giao hàng nhanh', 4, 12, 2025),
+('567890123456', 2, 1, 4, 'Hàng ổn, đóng gói chắc chắn', 5, 12, 2025),
+('678901234567', 1, 2, 5, 'Rất hài lòng, dùng tốt', 6, 12, 2025),
+('678901234567', 2, 2, 4, 'Sản phẩm đúng mô tả', 7, 12, 2025),
+('678901234567', 5, 2, 5, 'Chất lượng vượt mong đợi', 8, 12, 2025);
+
+-- Yêu cầu đổi trả
+INSERT INTO YeuCauDoiTra (CCCD, MaDonHang, LyDoDoiTra, Ngay, Thang, Nam, TrangThai) VALUES
+('567890123456', 12, 'Sản phẩm bị lỗi kỹ thuật', 5, 12, 2025, 'Chờ xác nhận'),
+('567890123456', 13, 'Giao sai màu sắc', 5, 12, 2025, 'Chờ xác nhận'),
+('678901234567', 14, 'Sản phẩm không đúng mô tả', 5, 12, 2025, 'Chờ xác nhận'),
+('678901234567', 15, 'Bao bì hư hỏng, nghi ngờ va đập', 5, 12, 2025, 'Chờ xác nhận'),
+('678901234567', 16, 'Không còn nhu cầu sử dụng', 5, 12, 2025, 'Chờ xác nhận');

@@ -41,10 +41,37 @@ CREATE TABLE NguoiDung (
     CapDoMuaHang ENUM('Đồng', 'Bạc', 'Vàng', 'Kim Cương') DEFAULT NULL,
     PRIMARY KEY (CCCD),
     UNIQUE KEY uniq_cccd (CCCD),
-    -- UNIQUE KEY uniq_ten (Ten),
     UNIQUE KEY uniq_sdt (SoDienThoaiXacMinh),
-    UNIQUE KEY uniq_taikhoan (TaiKhoan)
+    UNIQUE KEY uniq_taikhoan (TaiKhoan),
+    CONSTRAINT chk_cccd
+        CHECK (CCCD REGEXP '^[0-9]{12}$'),
+    CONSTRAINT chk_nguoidung_ten 
+        CHECK (
+            Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
+        )
 );
+
+DELIMITER $$
+
+CREATE TRIGGER trg_check_tuoi_nguoidung
+BEFORE INSERT ON NguoiDung
+FOR EACH ROW
+BEGIN
+    DECLARE tuoi INT;
+    SET tuoi = TIMESTAMPDIFF(
+        YEAR,
+        STR_TO_DATE(CONCAT(NEW.NamSinh, '-', NEW.ThangSinh, '-', NEW.NgaySinh), '%Y-%m-%d'),
+        CURDATE()
+    );
+
+    IF tuoi < 14 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Khách hàng phải >= 14 tuổi (đủ tuổi có CCCD)';
+    END IF;
+END$$
+
+DELIMITER ;
+
 
 CREATE TABLE NganHang (
     CCCD VARCHAR(12) NOT NULL,
@@ -85,6 +112,10 @@ CREATE TABLE SanPham (
     KEY idx_sanpham_mashop (MaShop),
     CONSTRAINT chk_sanpham_soluong CHECK (SoLuong >= 0),
     CONSTRAINT chk_sanpham_giaban CHECK (GiaBan > 0),
+    CONSTRAINT chk_sanpham_ten 
+        CHECK (
+            Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
+        ),
     CONSTRAINT fk_sanpham_shop FOREIGN KEY (MaShop)
         REFERENCES Shop (MaShop)
         ON DELETE RESTRICT
@@ -107,6 +138,45 @@ CREATE TABLE DanhGia (
         REFERENCES NguoiDung (CCCD),
     CONSTRAINT chk_danhgia_diem CHECK (Diem IN (0, 1, 2, 3, 4, 5))
 );
+
+DELIMITER $$
+
+CREATE TRIGGER trg_check_danhgia
+BEFORE INSERT ON DanhGia
+FOR EACH ROW
+BEGIN
+    -- Kiểm tra khách hàng chưa mua hàng ko được đánh giá
+    IF NOT EXISTS (
+        SELECT 1
+        FROM DonHang dh
+        JOIN GioPhu gp ON gp.MaDonHang = dh.MaDonHang
+        JOIN GioPhuChuaSanPham gpcs 
+            ON gpcs.MaGioHang = gp.MaGioHang 
+           AND gpcs.MaGioPhu = gp.MaGioPhu
+        WHERE dh.CCCD = NEW.CCCD
+          AND gpcs.MaSanPham = NEW.MaSanPham
+          AND gpcs.MaShop = NEW.MaShop
+          AND dh.TrangThaiDonHang IN ('Đã nhận được hàng', 'Đánh giá')
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Khách hàng chưa mua sản phẩm này nên không thể đánh giá.';
+    END IF;
+
+    -- Kiểm tra không được đánh giá sản phẩm 2 lần
+    IF EXISTS (
+        SELECT 1 FROM DanhGia dg
+        WHERE dg.CCCD = NEW.CCCD
+          AND dg.MaSanPham = NEW.MaSanPham
+          AND dg.MaShop = NEW.MaShop
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Sản phẩm này đã được đánh giá trước đó.';
+    END IF;
+
+END $$
+
+DELIMITER ;
+
 
 CREATE TABLE HoSoLienLac (
     CCCD VARCHAR(12) NOT NULL,
@@ -170,11 +240,11 @@ CREATE TABLE SanPhamThuocVao (
     MaShop INT NOT NULL,
     MaThuongHieu INT NOT NULL,
     MaDanhMuc INT NOT NULL,
-    PRIMARY KEY (MaSanPham, Mashop),
+    PRIMARY KEY (MaSanPham, MaShop),
     KEY idx_sanphamthuocvao_thuonghieu (MaThuongHieu),
     KEY idx_sanphamthuocvao_danhmuc (MaDanhMuc),
-    CONSTRAINT fk_sanphamthuocvao_sanpham FOREIGN KEY (MaSanPham, Mashop)
-        REFERENCES SanPham (MaSanPham, Mashop)
+    CONSTRAINT fk_sanphamthuocvao_sanpham FOREIGN KEY (MaSanPham, MaShop)
+        REFERENCES SanPham (MaSanPham, MaShop)
         ON DELETE CASCADE,
     CONSTRAINT fk_sanphamthuocvao_thuonghieu FOREIGN KEY (MaThuongHieu)
         REFERENCES ThuongHieu (MaThuongHieu),
@@ -202,6 +272,9 @@ CREATE TABLE DonHang (
     MaHoSo INT,
     MaGioHang INT NOT NULL,
     MaGioPhu INT NOT NULL,
+    NgayGiao INT,
+    ThangGiao INT,
+    NamGiao INT,
     PRIMARY KEY (MaDonHang),
     KEY idx_donhang_ho_so (MaHoSo, CCCD),
     KEY idx_donhang_giohang (MaGioHang),
@@ -214,6 +287,25 @@ CREATE TABLE DonHang (
         ON DELETE RESTRICT,
     CONSTRAINT chk_donhang_giavanchuyen CHECK (GiaVanChuyen >= 0)
 );
+
+DELIMITER $$
+
+CREATE TRIGGER trg_set_ngay_giao
+BEFORE UPDATE ON DonHang
+FOR EACH ROW
+BEGIN
+    -- Nếu trạng thái chuyển sang "Đã nhận được hàng"
+    IF NEW.TrangThaiDonHang = 'Đã nhận được hàng'
+       AND OLD.TrangThaiDonHang <> 'Đã nhận được hàng' THEN
+
+        -- Gán ngày giao hàng bằng ngày hiện tại
+        SET NEW.NgayGiao = DAY(CURRENT_DATE());
+        SET NEW.ThangGiao = MONTH(CURRENT_DATE());
+        SET NEW.NamGiao = YEAR(CURRENT_DATE());
+    END IF;
+END $$
+
+DELIMITER ;
 
 -- Liên kết giỏ phụ với đơn hàng và sản phẩm
 CREATE TABLE GioPhu (
@@ -266,6 +358,41 @@ CREATE TABLE YeuCauDoiTra (
     CONSTRAINT fk_ycdr_donhang FOREIGN KEY (MaDonHang)
         REFERENCES DonHang (MaDonHang)
 );
+
+DELIMITER $$
+
+CREATE TRIGGER trg_check_yeucau_doitra
+BEFORE INSERT ON YeuCauDoiTra
+FOR EACH ROW
+BEGIN
+    DECLARE ngay_giao DATE;
+    DECLARE ngay_yeucau DATE;
+
+    -- Lấy ngày giao từ DonHang
+    SELECT STR_TO_DATE(CONCAT(NgayGiao, '/', ThangGiao, '/', NamGiao), '%d/%m/%Y')
+    INTO ngay_giao
+    FROM DonHang
+    WHERE MaDonHang = NEW.MaDonHang;
+
+    -- Kiểm tra nếu đơn chưa giao hàng
+    IF ngay_giao IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Đơn hàng chưa được giao, không thể yêu cầu đổi trả.';
+    END IF;
+
+    -- Ngày tạo yêu cầu
+    SET ngay_yeucau = STR_TO_DATE(CONCAT(NEW.Ngay, '/', NEW.Thang, '/', NEW.Nam), '%d/%m/%Y');
+
+    -- Kiểm tra điều kiện phải nằm trong 7 ngày kể từ ngày giao
+    IF DATEDIFF(ngay_yeucau, ngay_giao) > 7 OR DATEDIFF(ngay_yeucau, ngay_giao) < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Yêu cầu đổi trả chỉ hợp lệ trong vòng 7 ngày sau khi nhận hàng.';
+    END IF;
+
+END $$
+
+DELIMITER ;
+
 
 CREATE TABLE ThanhToan (
     MaThanhToan INT NOT NULL AUTO_INCREMENT,
