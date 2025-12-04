@@ -105,6 +105,7 @@ CREATE TABLE SanPham (
     MaShop INT NOT NULL,
     MaSanPham INT NOT NULL,
     Ten VARCHAR(255),
+    AnhUrl VARCHAR(512),
     SoLuong INT,
     GiaBan INT,
     DaXoa TINYINT(1) NOT NULL DEFAULT 0,

@@ -8,6 +8,7 @@ CREATE PROCEDURE sp_SuaSanPham(
     IN p_MaShop INT,
     IN p_MaSanPham INT,
     IN p_Ten VARCHAR(255),
+    IN p_AnhUrl VARCHAR(512),
     IN p_SoLuong INT,
     IN p_GiaBan INT,
     IN p_MaThuongHieu INT,
@@ -30,6 +31,12 @@ BEGIN
 
         UPDATE SanPham
         SET Ten = p_Ten
+        WHERE MaShop = p_MaShop AND MaSanPham = p_MaSanPham;
+    END IF;
+
+    IF p_AnhUrl IS NOT NULL THEN
+        UPDATE SanPham
+        SET AnhUrl = p_AnhUrl
         WHERE MaShop = p_MaShop AND MaSanPham = p_MaSanPham;
     END IF;
 
@@ -135,6 +142,7 @@ DROP PROCEDURE IF EXISTS sp_ThemSanPham$$
 CREATE PROCEDURE sp_ThemSanPham(
     IN p_MaShop INT,
     IN p_Ten VARCHAR(255),
+    IN p_AnhUrl VARCHAR(512),
     IN p_SoLuong INT,
     IN p_GiaBan INT,
     IN p_MaDanhMuc INT,
@@ -191,8 +199,8 @@ BEGIN
     WHERE MaShop = p_MaShop;
 
     -- Thêm sản phẩm
-    INSERT INTO SanPham (MaShop, MaSanPham, Ten, SoLuong, GiaBan)
-    VALUES (p_MaShop, v_MaxMaSanPham, p_Ten, p_SoLuong, p_GiaBan);
+    INSERT INTO SanPham (MaShop, MaSanPham, Ten, AnhUrl, SoLuong, GiaBan)
+    VALUES (p_MaShop, v_MaxMaSanPham, p_Ten, p_AnhUrl, p_SoLuong, p_GiaBan);
 
     -- Thêm vào bảng mapping
     INSERT INTO SanPhamThuocVao (MaShop, MaSanPham, MaThuongHieu, MaDanhMuc)
