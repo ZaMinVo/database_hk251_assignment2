@@ -388,8 +388,8 @@ INSERT INTO DanhGia (CCCD, MaSanPham, MaShop, Diem, NoiDung, Ngay, Thang, Nam) V
 
 -- Yêu cầu đổi trả
 INSERT INTO YeuCauDoiTra (CCCD, MaDonHang, LyDoDoiTra, Ngay, Thang, Nam, TrangThai) VALUES
-('567890123456', 12, 'Sản phẩm bị lỗi kỹ thuật', 9, 12, 2025, 'Chờ xác nhận'),
-('567890123456', 13, 'Giao sai màu sắc', 10, 12, 2025, 'Chờ xác nhận'),
-('678901234567', 14, 'Sản phẩm không đúng mô tả', 11, 12, 2025, 'Chờ xác nhận'),
-('678901234567', 15, 'Bao bì hư hỏng, nghi ngờ va đập', 12, 12, 2025, 'Chờ xác nhận'),
-('678901234567', 16, 'Không còn nhu cầu sử dụng', 14, 12, 2025, 'Chờ xác nhận');
+('567890123456', 12, 'Sản phẩm bị lỗi kỹ thuật', 5, 12, 2025, 'Chờ xác nhận'),
+('567890123456', 13, 'Giao sai màu sắc', 5, 12, 2025, 'Chờ xác nhận'),
+('678901234567', 14, 'Sản phẩm không đúng mô tả', 5, 12, 2025, 'Chờ xác nhận'),
+('678901234567', 15, 'Bao bì hư hỏng, nghi ngờ va đập', 5, 12, 2025, 'Chờ xác nhận'),
+('678901234567', 16, 'Không còn nhu cầu sử dụng', 5, 12, 2025, 'Chờ xác nhận');
