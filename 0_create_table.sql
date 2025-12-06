@@ -45,7 +45,7 @@ CREATE TABLE NguoiDung (
     UNIQUE KEY uniq_taikhoan (TaiKhoan),
     CONSTRAINT chk_cccd
         CHECK (CCCD REGEXP '^[0-9]{12}$'),
-    CONSTRAINT chk_sdt
+    CONSTRAINT chk_nguoidung_sdt
         CHECK (SoDienThoaiXacMinh REGEXP '^[0-9]{10}$'),
     CONSTRAINT chk_nguoidung_ten 
         CHECK (
@@ -192,6 +192,12 @@ CREATE TABLE HoSoLienLac (
     DiaChi VARCHAR(255),
     PRIMARY KEY (MaHoSo, CCCD),
     KEY idx_hosolienlac_cccd (CCCD),
+    CONSTRAINT chk_hosolienlac_ten 
+        CHECK (
+            Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
+        ),
+    CONSTRAINT chk_hosolienlac_sdt
+        CHECK (SDT REGEXP '^[0-9]{10}$'),
     CONSTRAINT fk_hosolienlac_nguoidung FOREIGN KEY (CCCD)
         REFERENCES NguoiDung (CCCD)
         ON DELETE CASCADE
