@@ -29,16 +29,24 @@ BEGIN
     WHERE gp.MaGioHang = p_MaGioHang AND gp.MaGioPhu = p_MaGioPhu;
 
     SELECT MaDonHang INTO v_MaDonHang
-    FROM GioPhu
-    WHERE MaGioHang = p_MaGioHang AND MaGioPhu = p_MaGioPhu
+    FROM DonHang
+    WHERE MaGioHang = p_MaGioHang
+      AND MaGioPhu = p_MaGioPhu
     LIMIT 1;
 
+    -- Cập nhật tổng giá đơn hàng
     IF v_MaDonHang IS NOT NULL THEN
-        UPDATE DonHang dh
-        SET TongGia = COALESCE((
-            SELECT SUM(gp2.TongGia) FROM GioPhu gp2 WHERE gp2.MaDonHang = v_MaDonHang
-        ), 0) + COALESCE(dh.GiaVanChuyen, 0)
-        WHERE dh.MaDonHang = v_MaDonHang;
+        UPDATE DonHang
+        SET TongGia = (
+            COALESCE((
+                SELECT SUM(TongGia)
+                FROM GioPhu gp
+                WHERE gp.MaGioHang = p_MaGioHang
+                  AND gp.MaGioPhu  = p_MaGioPhu
+            ), 0)
+            + COALESCE(GiaVanChuyen, 0)
+        )
+        WHERE MaDonHang = v_MaDonHang;
     END IF;
 END$$
 DELIMITER ;
@@ -118,11 +126,17 @@ AFTER UPDATE ON DonHang
 FOR EACH ROW
 BEGIN
     IF NOT (OLD.GiaVanChuyen <=> NEW.GiaVanChuyen) THEN
-        UPDATE DonHang dh
-        SET TongGia = COALESCE((
-            SELECT SUM(gp.TongGia) FROM GioPhu gp WHERE gp.MaDonHang = NEW.MaDonHang
-        ), 0) + COALESCE(NEW.GiaVanChuyen, 0)
-        WHERE dh.MaDonHang = NEW.MaDonHang;
+        UPDATE DonHang
+        SET TongGia = (
+            COALESCE((
+                SELECT SUM(TongGia)
+                FROM GioPhu gp
+                WHERE gp.MaGioHang = NEW.MaGioHang
+                  AND gp.MaGioPhu  = NEW.MaGioPhu
+            ), 0)
+            + COALESCE(NEW.GiaVanChuyen, 0)
+        )
+        WHERE MaDonHang = NEW.MaDonHang;
     END IF;
 END$$
 DELIMITER ;

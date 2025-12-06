@@ -45,6 +45,8 @@ CREATE TABLE NguoiDung (
     UNIQUE KEY uniq_taikhoan (TaiKhoan),
     CONSTRAINT chk_cccd
         CHECK (CCCD REGEXP '^[0-9]{12}$'),
+    CONSTRAINT chk_sdt
+        CHECK (SoDienThoaiXacMinh REGEXP '^[0-9]{10}$'),
     CONSTRAINT chk_nguoidung_ten 
         CHECK (
             Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
@@ -146,13 +148,15 @@ CREATE TRIGGER trg_check_danhgia
 BEFORE INSERT ON DanhGia
 FOR EACH ROW
 BEGIN
-    -- Kiểm tra khách hàng chưa mua hàng ko được đánh giá
+    -- 1. Kiểm tra khách hàng chưa mua sản phẩm thì không được đánh giá
     IF NOT EXISTS (
         SELECT 1
         FROM DonHang dh
-        JOIN GioPhu gp ON gp.MaDonHang = dh.MaDonHang
-        JOIN GioPhuChuaSanPham gpcs 
-            ON gpcs.MaGioHang = gp.MaGioHang 
+        JOIN GioPhu gp 
+            ON gp.MaGioHang = dh.MaGioHang
+           AND gp.MaGioPhu = dh.MaGioPhu
+        JOIN GioPhuChuaSanPham gpcs
+            ON gpcs.MaGioHang = gp.MaGioHang
            AND gpcs.MaGioPhu = gp.MaGioPhu
         WHERE dh.CCCD = NEW.CCCD
           AND gpcs.MaSanPham = NEW.MaSanPham
@@ -163,7 +167,8 @@ BEGIN
             SET MESSAGE_TEXT = 'Khách hàng chưa mua sản phẩm này nên không thể đánh giá.';
     END IF;
 
-    -- Kiểm tra không được đánh giá sản phẩm 2 lần
+
+    -- 2. Kiểm tra không được đánh giá cùng sản phẩm 2 lần
     IF EXISTS (
         SELECT 1 FROM DanhGia dg
         WHERE dg.CCCD = NEW.CCCD
@@ -226,14 +231,18 @@ CREATE TABLE ThuongHieu (
     MaThuongHieu INT NOT NULL,
     TenThuongHieu VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY (MaThuongHieu),
-    UNIQUE KEY uniq_thuonghieu_ten (TenThuongHieu)
+    UNIQUE KEY uniq_thuonghieu_ten (TenThuongHieu),
+    CONSTRAINT chk_thuonghieu_ten 
+        CHECK (TenThuongHieu REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$')
 );
 
 CREATE TABLE DanhMuc (
     MaDanhMuc INT NOT NULL,
     TenDanhMuc VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY (MaDanhMuc),
-    UNIQUE KEY uniq_danhmuc_ten (TenDanhMuc)
+    UNIQUE KEY uniq_danhmuc_ten (TenDanhMuc),
+    CONSTRAINT chk_danhmuc_ten 
+        CHECK (TenDanhMuc REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$')
 );
 
 CREATE TABLE SanPhamThuocVao (
@@ -283,9 +292,10 @@ CREATE TABLE DonHang (
         REFERENCES HoSoLienLac (MaHoSo, CCCD)
         ON DELETE SET NULL
         ON UPDATE RESTRICT,
-    CONSTRAINT fk_donhang_giohang FOREIGN KEY (MaGioHang)
-        REFERENCES GioHang (MaGioHang)
-        ON DELETE RESTRICT,
+    CONSTRAINT fk_donhang_giohang_giophu FOREIGN KEY (MaGioHang, MaGioPhu)
+        REFERENCES GioPhu (MaGioHang, MaGioPhu)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
     CONSTRAINT chk_donhang_giavanchuyen CHECK (GiaVanChuyen >= 0)
 );
 
@@ -312,13 +322,7 @@ DELIMITER ;
 CREATE TABLE GioPhu (
     MaGioHang INT NOT NULL,
     MaGioPhu INT NOT NULL,
-    MaDonHang INT NOT NULL,
     PRIMARY KEY (MaGioHang, MaGioPhu),
-    KEY idx_giophu_donhang (MaDonHang),
-    CONSTRAINT fk_giophu_donhang FOREIGN KEY (MaDonHang)
-        REFERENCES DonHang (MaDonHang)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
     CONSTRAINT fk_giophu_giohang FOREIGN KEY (MaGioHang)
         REFERENCES GioHang (MaGioHang)
         ON DELETE CASCADE

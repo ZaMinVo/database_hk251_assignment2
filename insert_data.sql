@@ -238,28 +238,28 @@ INSERT INTO DonHang (MaDonHang, GiaVanChuyen, TrangThaiDonHang, MaDonViVanChuyen
 (32, 33000, 'Đơn hàng đã thanh toán', 'GHTK', '101010101010', 2, 10, 2);
 
 -- Giỏ phụ gắn đơn hàng
-INSERT INTO GioPhu (MaGioHang, MaGioPhu, MaDonHang) VALUES
-(1, 1, 12),
-(1, 2, 13),
-(2, 1, 14),
-(2, 2, 15),
-(2, 3, 16),
-(3, 1, 17),
-(3, 2, 18),
-(4, 1, 19),
-(4, 2, 20),
-(5, 1, 21),
-(5, 2, 22),
-(6, 1, 23),
-(6, 2, 24),
-(7, 1, 25),
-(7, 2, 26),
-(8, 1, 27),
-(8, 2, 28),
-(9, 1, 29),
-(9, 2, 30),
-(10, 1, 31),
-(10, 2, 32);
+INSERT INTO GioPhu (MaGioHang, MaGioPhu) VALUES
+(1, 1),
+(1, 2),
+(2, 1),
+(2, 2),
+(2, 3),
+(3, 1),
+(3, 2),
+(4, 1),
+(4, 2),
+(5, 1),
+(5, 2),
+(6, 1),
+(6, 2),
+(7, 1),
+(7, 2),
+(8, 1),
+(8, 2),
+(9, 1),
+(9, 2),
+(10, 1),
+(10, 2);
 
 -- Chi tiết sản phẩm trong giỏ phụ
 INSERT INTO GioPhuChuaSanPham (MaGioHang, MaGioPhu, MaSanPham, MaShop, SoLuong) VALUES
@@ -388,8 +388,8 @@ INSERT INTO DanhGia (CCCD, MaSanPham, MaShop, Diem, NoiDung, Ngay, Thang, Nam) V
 
 -- Yêu cầu đổi trả
 INSERT INTO YeuCauDoiTra (CCCD, MaDonHang, LyDoDoiTra, Ngay, Thang, Nam, TrangThai) VALUES
-('567890123456', 12, 'Sản phẩm bị lỗi kỹ thuật', 5, 12, 2025, 'Chờ xác nhận'),
-('567890123456', 13, 'Giao sai màu sắc', 5, 12, 2025, 'Chờ xác nhận'),
-('678901234567', 14, 'Sản phẩm không đúng mô tả', 5, 12, 2025, 'Chờ xác nhận'),
-('678901234567', 15, 'Bao bì hư hỏng, nghi ngờ va đập', 5, 12, 2025, 'Chờ xác nhận'),
-('678901234567', 16, 'Không còn nhu cầu sử dụng', 5, 12, 2025, 'Chờ xác nhận');
+('567890123456', 12, 'Sản phẩm bị lỗi kỹ thuật', 8, 12, 2025, 'Chờ xác nhận'),
+('567890123456', 13, 'Giao sai màu sắc', 8, 12, 2025, 'Chờ xác nhận'),
+('678901234567', 14, 'Sản phẩm không đúng mô tả', 8, 12, 2025, 'Chờ xác nhận'),
+('678901234567', 15, 'Bao bì hư hỏng, nghi ngờ va đập', 8, 12, 2025, 'Chờ xác nhận'),
+('678901234567', 16, 'Không còn nhu cầu sử dụng', 8, 12, 2025, 'Chờ xác nhận');
