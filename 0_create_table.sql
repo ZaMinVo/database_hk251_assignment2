@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS HoSoLienLac;
 DROP TABLE IF EXISTS NganHang;
 DROP TABLE IF EXISTS NguoiDung;
 
--- Nhóm người dùng / tài khoản
+ -- Nhóm người dùng 
 CREATE TABLE NguoiDung (
     CCCD VARCHAR(12) NOT NULL,
     Ten VARCHAR(255) NOT NULL,
@@ -45,6 +45,8 @@ CREATE TABLE NguoiDung (
     UNIQUE KEY uniq_taikhoan (TaiKhoan),
     CONSTRAINT chk_cccd
         CHECK (CCCD REGEXP '^[0-9]{12}$'),
+    CONSTRAINT chk_sdt
+        CHECK (SoDienThoaiXacMinh REGEXP '^[0-9]{10}$'),
     CONSTRAINT chk_nguoidung_ten 
         CHECK (
             Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
@@ -73,6 +75,7 @@ END$$
 DELIMITER ;
 
 
+
 CREATE TABLE NganHang (
     CCCD VARCHAR(12) NOT NULL,
     MaNganHang VARCHAR(19) NOT NULL,
@@ -97,9 +100,14 @@ CREATE TABLE Shop (
     UNIQUE KEY uniq_shop_cccd (CCCD),
     CONSTRAINT fk_shop_nguoidung FOREIGN KEY (CCCD)
         REFERENCES NguoiDung (CCCD)
+CONSTRAINT chk_shop_ten 
+        CHECK (
+            Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
+        ),
         ON DELETE CASCADE
         ON UPDATE CASCADE
-);
+); 
+
 
 CREATE TABLE SanPham (
     MaShop INT NOT NULL,
@@ -178,7 +186,6 @@ END $$
 
 DELIMITER ;
 
-
 CREATE TABLE HoSoLienLac (
     CCCD VARCHAR(12) NOT NULL,
     MaHoSo INT NOT NULL,
@@ -187,6 +194,12 @@ CREATE TABLE HoSoLienLac (
     DiaChi VARCHAR(255),
     PRIMARY KEY (MaHoSo, CCCD),
     KEY idx_hosolienlac_cccd (CCCD),
+    CONSTRAINT chk_sdt
+        CHECK (SDT REGEXP '^[0-9]{10}$'),
+    CONSTRAINT chk_nguoidung_ten 
+        CHECK (
+            Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
+        ),
     CONSTRAINT fk_hosolienlac_nguoidung FOREIGN KEY (CCCD)
         REFERENCES NguoiDung (CCCD)
         ON DELETE CASCADE
@@ -225,6 +238,10 @@ DELIMITER ;
 CREATE TABLE ThuongHieu (
     MaThuongHieu INT NOT NULL,
     TenThuongHieu VARCHAR(255) DEFAULT NULL,
+    CONSTRAINT chk_thuonghieu_ten 
+        CHECK (
+            TenThuongHieu REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
+        ),
     PRIMARY KEY (MaThuongHieu),
     UNIQUE KEY uniq_thuonghieu_ten (TenThuongHieu)
 );
@@ -232,6 +249,10 @@ CREATE TABLE ThuongHieu (
 CREATE TABLE DanhMuc (
     MaDanhMuc INT NOT NULL,
     TenDanhMuc VARCHAR(255) DEFAULT NULL,
+    CONSTRAINT chk_thuonghieu_ten 
+        CHECK (
+            TenDanhMuc REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
+        ),
     PRIMARY KEY (MaDanhMuc),
     UNIQUE KEY uniq_danhmuc_ten (TenDanhMuc)
 );
@@ -283,8 +304,8 @@ CREATE TABLE DonHang (
         REFERENCES HoSoLienLac (MaHoSo, CCCD)
         ON DELETE SET NULL
         ON UPDATE RESTRICT,
-    CONSTRAINT fk_donhang_giohang FOREIGN KEY (MaGioHang)
-        REFERENCES GioHang (MaGioHang)
+    CONSTRAINT fk_donhang_giohang_giophu FOREIGN KEY (MaGioHang, MaGioPhu)
+        REFERENCES GioPhu (MaGioHang, MaGioPhu)
         ON DELETE RESTRICT,
     CONSTRAINT chk_donhang_giavanchuyen CHECK (GiaVanChuyen >= 0)
 );
@@ -312,13 +333,7 @@ DELIMITER ;
 CREATE TABLE GioPhu (
     MaGioHang INT NOT NULL,
     MaGioPhu INT NOT NULL,
-    MaDonHang INT NOT NULL,
     PRIMARY KEY (MaGioHang, MaGioPhu),
-    KEY idx_giophu_donhang (MaDonHang),
-    CONSTRAINT fk_giophu_donhang FOREIGN KEY (MaDonHang)
-        REFERENCES DonHang (MaDonHang)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
     CONSTRAINT fk_giophu_giohang FOREIGN KEY (MaGioHang)
         REFERENCES GioHang (MaGioHang)
         ON DELETE CASCADE
@@ -331,7 +346,7 @@ CREATE TABLE GioPhuChuaSanPham (
     MaSanPham INT NOT NULL,
     MaShop INT NOT NULL,
     SoLuong INT,
-    PRIMARY KEY (MaGioPhu, MaSanPham, MaGioHang, MaShop),
+    PRIMARY KEY (MaGioHang,MaGioPhu,MaSanPham,MaShop),
     KEY idx_gpcs_sanpham (MaSanPham, MaShop),
     KEY idx_gpcs_giophu (MaGioHang, MaGioPhu),
     CONSTRAINT fk_gpcs_sanpham FOREIGN KEY (MaSanPham, MaShop)
