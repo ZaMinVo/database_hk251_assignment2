@@ -114,15 +114,11 @@ BEGIN
     ELSE
         -- Hard delete: xóa các dữ liệu liên quan
 
-        -- 1. Xóa đánh giá
-        DELETE FROM DanhGia
-        WHERE MaSanPham = p_MaSanPham AND MaShop = p_MaShop;
-
-        -- 2. Xóa thông tin sản phẩm trong bảng SanPhamThuocVao
+        -- 1. Xóa thông tin sản phẩm trong bảng SanPhamThuocVao
         DELETE FROM SanPhamThuocVao
         WHERE MaSanPham = p_MaSanPham AND MaShop = p_MaShop;
 
-        -- 3. Xóa sản phẩm khỏi GioPhuChuaSanPham nếu GioPhu chưa thuộc đơn hàng nào
+        -- 2. Xóa sản phẩm khỏi GioPhuChuaSanPham nếu GioPhu chưa thuộc đơn hàng nào
         DELETE gps
         FROM GioPhuChuaSanPham gps
         LEFT JOIN GioPhu gp ON gps.MaGioHang = gp.MaGioHang AND gps.MaGioPhu = gp.MaGioPhu
@@ -131,7 +127,7 @@ BEGIN
           AND gps.MaShop = p_MaShop
           AND dh.MaDonHang IS NULL;
 
-        -- 4. Xóa sản phẩm
+        -- 3. Xóa sản phẩm
         DELETE FROM SanPham
         WHERE MaSanPham = p_MaSanPham AND MaShop = p_MaShop;
     END IF;
