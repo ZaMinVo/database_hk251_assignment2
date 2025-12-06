@@ -194,7 +194,7 @@ CREATE TABLE HoSoLienLac (
     KEY idx_hosolienlac_cccd (CCCD),
     CONSTRAINT chk_hosolienlac_ten 
         CHECK (
-            Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
+            Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư]+( [A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư]+)* - (Nhà|Cơ quan)$'
         ),
     CONSTRAINT chk_hosolienlac_sdt
         CHECK (SDT REGEXP '^[0-9]{10}$'),
