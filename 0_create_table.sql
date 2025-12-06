@@ -100,14 +100,13 @@ CREATE TABLE Shop (
     UNIQUE KEY uniq_shop_cccd (CCCD),
     CONSTRAINT fk_shop_nguoidung FOREIGN KEY (CCCD)
         REFERENCES NguoiDung (CCCD)
-CONSTRAINT chk_shop_ten 
+		ON DELETE CASCADE
+        ON UPDATE CASCADE,
+	CONSTRAINT chk_shop_ten 
         CHECK (
             Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
-        ),
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+        )
 ); 
-
 
 CREATE TABLE SanPham (
     MaShop INT NOT NULL,
@@ -154,26 +153,29 @@ CREATE TRIGGER trg_check_danhgia
 BEFORE INSERT ON DanhGia
 FOR EACH ROW
 BEGIN
-    -- Kiểm tra khách hàng chưa mua hàng ko được đánh giá
+    -- 1. Kiểm tra khách hàng đã mua sản phẩm hay chưa
     IF NOT EXISTS (
         SELECT 1
         FROM DonHang dh
-        JOIN GioPhu gp ON gp.MaDonHang = dh.MaDonHang
-        JOIN GioPhuChuaSanPham gpcs 
-            ON gpcs.MaGioHang = gp.MaGioHang 
-           AND gpcs.MaGioPhu = gp.MaGioPhu
+        JOIN GioPhu gp
+            ON gp.MaGioHang = dh.MaGioHang
+           AND gp.MaGioPhu  = dh.MaGioPhu
+        JOIN GioPhuChuaSanPham gpcs
+            ON gpcs.MaGioHang = gp.MaGioHang
+           AND gpcs.MaGioPhu  = gp.MaGioPhu
         WHERE dh.CCCD = NEW.CCCD
           AND gpcs.MaSanPham = NEW.MaSanPham
-          AND gpcs.MaShop = NEW.MaShop
+          AND gpcs.MaShop     = NEW.MaShop
           AND dh.TrangThaiDonHang IN ('Đã nhận được hàng', 'Đánh giá')
     ) THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Khách hàng chưa mua sản phẩm này nên không thể đánh giá.';
     END IF;
 
-    -- Kiểm tra không được đánh giá sản phẩm 2 lần
+    -- 2. Kiểm tra không đánh giá trùng lặp
     IF EXISTS (
-        SELECT 1 FROM DanhGia dg
+        SELECT 1
+        FROM DanhGia dg
         WHERE dg.CCCD = NEW.CCCD
           AND dg.MaSanPham = NEW.MaSanPham
           AND dg.MaShop = NEW.MaShop
@@ -194,9 +196,9 @@ CREATE TABLE HoSoLienLac (
     DiaChi VARCHAR(255),
     PRIMARY KEY (MaHoSo, CCCD),
     KEY idx_hosolienlac_cccd (CCCD),
-    CONSTRAINT chk_sdt
+    CONSTRAINT chk_hosolienlac_sdt
         CHECK (SDT REGEXP '^[0-9]{10}$'),
-    CONSTRAINT chk_nguoidung_ten 
+    CONSTRAINT chk_nguoimua_ten 
         CHECK (
             Ten REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
         ),
@@ -249,7 +251,7 @@ CREATE TABLE ThuongHieu (
 CREATE TABLE DanhMuc (
     MaDanhMuc INT NOT NULL,
     TenDanhMuc VARCHAR(255) DEFAULT NULL,
-    CONSTRAINT chk_thuonghieu_ten 
+    CONSTRAINT chk_danhmuc_ten 
         CHECK (
             TenDanhMuc REGEXP '^[A-Za-zÀ-Ỵà-ỵĂăÂâĐđÊêÔôƠơƯư\\s]+$'
         ),

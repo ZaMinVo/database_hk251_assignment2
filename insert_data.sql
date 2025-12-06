@@ -55,61 +55,45 @@ VALUES
 ('000000000017','Shop I','HCM',9,1,2020),
 ('000000000019','Shop J','Da Nang',10,1,2020);
 
-
--- Shop
-INSERT INTO Shop (MaShop, CCCD, Ten, DiaChi, Ngay, Thang, Nam) VALUES
-(1, '012345678901', 'Shop A', '123 Nguyễn Huệ, Quận 1, TP.HCM', 1, 1, 2020),
-(2, '123456789012', 'Shop B', '456 Lê Lai, Quận 1, TP.HCM', 5, 3, 2021),
-(3, '234567890123', 'Shop C', '789 Nguyễn Trãi, Quận 5, TP.HCM', 10, 5, 2022),
-(4, '345678901234', 'Shop D', '321 Trần Hưng Đạo, Quận 1, TP.HCM', 15, 7, 2020),
-(5, '456789012345', 'Shop E', '654 Phạm Ngũ Lão, Quận 1, TP.HCM', 20, 9, 2021);
-
-INSERT INTO Shop (MaShop, CCCD, Ten, DiaChi, Ngay, Thang, Nam) VALUES
-(6, '111111111111', 'Shop F', '12 Hai Ba Trung, Quận 1, TP.HCM', 5, 2, 2022),
-(7, '222222222222', 'Shop G', '34 Cach Mang, Quận 3, TP.HCM', 12, 6, 2023),
-(8, '333333333333', 'Shop H', '56 Dien Bien Phu, Quận 3, TP.HCM', 18, 9, 2023),
-(9, '444444444444', 'Shop I', '78 Ly Thuong Kiet, Quận 10, TP.HCM', 25, 10, 2024),
-(10, '555555555555', 'Shop J', '90 Nguyen Van Linh, Quận 7, TP.HCM', 30, 11, 2024);
-
 -- Thương hiệu / danh mục
 INSERT INTO ThuongHieu (MaThuongHieu, TenThuongHieu) VALUES
-(1,'Thương Hiệu 1'),
-(2,'Thương Hiệu 2'),
-(3,'Thương Hiệu 3'),
-(4,'Thương Hiệu 4'),
-(5,'Thương Hiệu 5'),
-(6,'Thương Hiệu 6'),
-(7,'Thương Hiệu 7'),
-(8,'Thương Hiệu 8'),
-(9,'Thương Hiệu 9'),
-(10,'Thương Hiệu 10');
+(1,'Thương Hiệu a'),
+(2,'Thương Hiệu b'),
+(3,'Thương Hiệu c'),
+(4,'Thương Hiệu d'),
+(5,'Thương Hiệu e'),
+(6,'Thương Hiệu f'),
+(7,'Thương Hiệu g'),
+(8,'Thương Hiệu h'),
+(9,'Thương Hiệu i'),
+(10,'Thương Hiệu k');
 
 
 INSERT INTO DanhMuc (MaDanhMuc, TenDanhMuc) VALUES
-(1,'Danh Mục 1'),
-(2,'Danh Mục 2'),
-(3,'Danh Mục 3'),
-(4,'Danh Mục 4'),
-(5,'Danh Mục 5'),
-(6,'Danh Mục 6'),
-(7,'Danh Mục 7'),
-(8,'Danh Mục 8'),
-(9,'Danh Mục 9'),
-(10,'Danh Mục 10');
+(1,'Danh Mục a'),
+(2,'Danh Mục b'),
+(3,'Danh Mục c'),
+(4,'Danh Mục d'),
+(5,'Danh Mục e'),
+(6,'Danh Mục f'),
+(7,'Danh Mục g'),
+(8,'Danh Mục h'),
+(9,'Danh Mục i'),
+(10,'Danh Mục k');
 
 
 -- Sản phẩm
 INSERT INTO SanPham (MaShop, MaSanPham, Ten, AnhUrl, SoLuong, GiaBan, DaXoa) VALUES
-(1,1,'Sản phẩm 1','/images/p1.jpg',50,100000,0),
-(2,2,'Sản phẩm 2','/images/p2.jpg',30,200000,0),
-(3,3,'Sản phẩm 3','/images/p3.jpg',20,150000,0),
-(4,4,'Sản phẩm 4','/images/p4.jpg',40,120000,0),
-(5,5,'Sản phẩm 5','/images/p5.jpg',25,250000,0),
-(6,6,'Sản phẩm 6','/images/p6.jpg',60,80000,0),
-(7,7,'Sản phẩm 7','/images/p7.jpg',10,300000,0),
-(8,8,'Sản phẩm 8','/images/p8.jpg',35,90000,0),
-(9,9,'Sản phẩm 9','/images/p9.jpg',45,110000,0),
-(10,10,'Sản phẩm 10','/images/p10.jpg',15,400000,0);
+(1,1,'Sản phẩm','/images/p1.jpg',50,100000,0),
+(2,2,'Sản phẩm','/images/p2.jpg',30,200000,0),
+(3,3,'Sản phẩm','/images/p3.jpg',20,150000,0),
+(4,4,'Sản phẩm','/images/p4.jpg',40,120000,0),
+(5,5,'Sản phẩm','/images/p5.jpg',25,250000,0),
+(6,6,'Sản phẩm','/images/p6.jpg',60,80000,0),
+(7,7,'Sản phẩm','/images/p7.jpg',10,300000,0),
+(8,8,'Sản phẩm','/images/p8.jpg',35,90000,0),
+(9,9,'Sản phẩm','/images/p9.jpg',45,110000,0),
+(10,10,'Sản phẩm','/images/p10.jpg',15,400000,0);
 
 
 -- Mapping sản phẩm ↔ thương hiệu/danh mục
@@ -141,16 +125,16 @@ INSERT INTO SanPhamThuocVao (MaSanPham, MaShop, MaThuongHieu, MaDanhMuc) VALUES
 
 -- Hồ sơ liên lạc (địa chỉ nhận hàng)
 INSERT INTO HoSoLienLac (CCCD, MaHoSo, Ten, SDT, DiaChi) VALUES
-('000000000002',1,'Người nhận 2','0900000022','123 Đường A'),
-('000000000004',2,'Người nhận 4','0900000044','456 Đường B'),
-('000000000006',3,'Người nhận 6','0900000066','789 Đường C'),
-('000000000008',4,'Người nhận 8','0900000088','12 Đường D'),
-('000000000010',5,'Người nhận 10','0900000100','34 Đường E'),
-('000000000012',6,'Người nhận 12','0900000122','56 Đường F'),
-('000000000014',7,'Người nhận 14','0900000144','78 Đường G'),
-('000000000016',8,'Người nhận 16','0900000166','90 Đường H'),
-('000000000018',9,'Người nhận 18','0900000188','11 Đường I'),
-('000000000020',10,'Người nhận 20','0900000200','22 Đường J');
+('000000000002',1,'Người nhận','0900000022','123 Đường A'),
+('000000000004',2,'Người nhận','0900000044','456 Đường B'),
+('000000000006',3,'Người nhận','0900000066','789 Đường C'),
+('000000000008',4,'Người nhận','0900000088','12 Đường D'),
+('000000000010',5,'Người nhận','0900000100','34 Đường E'),
+('000000000012',6,'Người nhận','0900000122','56 Đường F'),
+('000000000014',7,'Người nhận','0900000144','78 Đường G'),
+('000000000016',8,'Người nhận','0900000166','90 Đường H'),
+('000000000018',9,'Người nhận','0900000188','11 Đường I'),
+('000000000020',10,'Người nhận','0900000200','22 Đường J');
 
 -- Giỏ hàng
 INSERT INTO GioHang (MaGioHang, CCCD) VALUES
@@ -269,18 +253,18 @@ UPDATE DonHang
 SET TrangThaiDonHang = 'Đã nhận được hàng'
 WHERE MaDonHang IN (12, 13, 14, 15, 16);
 
--- Đánh giá sản phẩm
 INSERT INTO DanhGia (CCCD, MaSanPham, MaShop, Diem, NoiDung, Ngay, Thang, Nam) VALUES
-('000000000004',2,2,5,'Rất hài lòng',26,11,2025),
-('000000000008',4,4,4,'Hàng ok',27,11,2025),
-('000000000012',6,6,5,'Tốt',24,11,2025),
-('000000000016',8,8,4,'Giao nhanh',23,11,2025),
-('000000000020',10,10,5,'Chất lượng tuyệt vời',22,11,2025);
+('000000000004', 2, 2, 5, 'Sản phẩm tốt, đóng gói chắc chắn.', 25, 11, 2025),
+('000000000008', 4, 4, 4, 'Hài lòng, giao hàng nhanh.', 26, 11, 2025),
+('000000000012', 6, 6, 5, 'Chất lượng vượt mong đợi.', 24, 11, 2025),
+('000000000016', 8, 8, 3, 'Tạm ổn, cần cải thiện.', 23, 11, 2025),
+('000000000020', 10, 10, 4, 'Giá hợp lý, đáng mua.', 22, 11, 2025);
+
 
 -- Yêu cầu đổi trả
-INSERT INTO YeuCauDoiTra (CCCD, MaDonHang, LyDoDoiTra, Ngay, Thang, Nam, TrangThai) VALUES
-('000000000004',2,'Hàng lỗi',28,11,2025,'Chờ xác nhận'),
-('000000000008',4,'Không đúng mô tả',29,11,2025,'Chờ xác nhận'),
-('000000000012',6,'Kích thước sai',25,11,2025,'Chờ xác nhận'),
-('000000000016',8,'Màu sắc khác',26,11,2025,'Chờ xác nhận'),
-('000000000020',10,'Sản phẩm hỏng',27,11,2025,'Chờ xác nhận'),
+INSERT INTO YeuCauDoiTra (CCCD, MaDonHang, LyDoDoiTra, Ngay, Thang, Nam) VALUES
+('000000000004', 2, 'Sản phẩm bị lỗi nhẹ', 27, 11, 2025),   -- 2 ngày sau giao (OK)
+('000000000008', 4, 'Không đúng mô tả', 28, 11, 2025),      -- 2 ngày sau giao (OK)
+('000000000012', 6, 'Hàng giao sai màu', 25, 11, 2025),     -- 1 ngày sau giao (OK)
+('000000000016', 8, 'Muốn đổi kích thước', 24, 11, 2025),   -- 1 ngày sau giao (OK)
+('000000000020', 10, 'Thiếu phụ kiện', 24, 11, 2025);       -- 2 ngày sau giao (OK)
