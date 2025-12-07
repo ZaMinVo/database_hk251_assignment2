@@ -215,10 +215,10 @@ INSERT INTO GioHang (MaGioHang, CCCD) VALUES
 
 -- Đơn hàng
 INSERT INTO DonHang (MaDonHang, GiaVanChuyen, TrangThaiDonHang, MaDonViVanChuyen, CCCD, MaHoSo, MaGioHang, MaGioPhu) VALUES
-(12, 30000, 'Đơn hàng đã đặt', 'GHN', '567890123456', 1, 1, 1),
-(13, 35000, 'Đơn hàng đã thanh toán', 'GHTK', '567890123456', 2, 1, 2),
-(14, 25000, 'Đơn hàng đã đặt', 'GHN', '678901234567', 1, 2, 1),
-(15, 27000, 'Đơn hàng đã thanh toán', 'GHTK', '678901234567', 2, 2, 2),
+(12, 30000, 'Đã giao cho đơn vị vận chuyển', 'GHN', '567890123456', 1, 1, 1),
+(13, 35000, 'Đã giao cho đơn vị vận chuyển', 'GHTK', '567890123456', 2, 1, 2),
+(14, 25000, 'Đã giao cho đơn vị vận chuyển', 'GHN', '678901234567', 1, 2, 1),
+(15, 27000, 'Đã giao cho đơn vị vận chuyển', 'GHTK', '678901234567', 2, 2, 2),
 (16, 29000, 'Đã giao cho đơn vị vận chuyển', 'VNPost', '678901234567', 1, 2, 3),
 (17, 32000, 'Đơn hàng đã đặt', 'GHTK', '789012345678', 1, 3, 1),
 (18, 31000, 'Đơn hàng đã thanh toán', 'GHN', '789012345678', 2, 3, 2),
