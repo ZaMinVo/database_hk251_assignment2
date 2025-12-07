@@ -101,10 +101,14 @@ BEGIN
     SELECT COUNT(*)
     INTO v_count
     FROM GioPhuChuaSanPham gps
-    INNER JOIN GioPhu gp ON gps.MaGioHang = gp.MaGioHang AND gps.MaGioPhu = gp.MaGioPhu
-    INNER JOIN DonHang dh ON gp.MaDonHang = dh.MaDonHang
+    JOIN GioPhu gp 
+        ON gps.MaGioHang = gp.MaGioHang
+        AND gps.MaGioPhu  = gp.MaGioPhu
+    JOIN DonHang dh
+        ON dh.MaGioHang = gp.MaGioHang 
+        AND dh.MaGioPhu  = gp.MaGioPhu
     WHERE gps.MaSanPham = p_MaSanPham
-      AND gps.MaShop = p_MaShop;
+    AND gps.MaShop = p_MaShop;
 
     IF v_count > 0 THEN
         -- Soft delete: đánh dấu DaXoa
@@ -121,8 +125,12 @@ BEGIN
         -- 2. Xóa sản phẩm khỏi GioPhuChuaSanPham nếu GioPhu chưa thuộc đơn hàng nào
         DELETE gps
         FROM GioPhuChuaSanPham gps
-        LEFT JOIN GioPhu gp ON gps.MaGioHang = gp.MaGioHang AND gps.MaGioPhu = gp.MaGioPhu
-        LEFT JOIN DonHang dh ON gp.MaDonHang = dh.MaDonHang
+        LEFT JOIN GioPhu gp 
+            ON gps.MaGioHang = gp.MaGioHang 
+           AND gps.MaGioPhu = gp.MaGioPhu
+        LEFT JOIN DonHang dh 
+            ON dh.MaGioHang = gp.MaGioHang
+           AND dh.MaGioPhu  = gp.MaGioPhu
         WHERE gps.MaSanPham = p_MaSanPham
           AND gps.MaShop = p_MaShop
           AND dh.MaDonHang IS NULL;
