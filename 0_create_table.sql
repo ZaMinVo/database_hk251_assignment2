@@ -307,6 +307,42 @@ CREATE TABLE DonHang (
 
 DELIMITER $$
 
+CREATE TRIGGER trg_donhang_force_order
+BEFORE UPDATE ON DonHang
+FOR EACH ROW
+BEGIN
+    DECLARE old_state INT;
+    DECLARE new_state INT;
+
+    -- Map trạng thái về số thứ tự
+    CASE OLD.TrangThaiDonHang
+        WHEN 'Đơn hàng đã đặt' THEN SET old_state = 1;
+        WHEN 'Đơn hàng đã thanh toán' THEN SET old_state = 2;
+        WHEN 'Đã giao cho đơn vị vận chuyển' THEN SET old_state = 3;
+        WHEN 'Đã nhận được hàng' THEN SET old_state = 4;
+        WHEN 'Đánh giá' THEN SET old_state = 5;
+    END CASE;
+
+    CASE NEW.TrangThaiDonHang
+        WHEN 'Đơn hàng đã đặt' THEN SET new_state = 1;
+        WHEN 'Đơn hàng đã thanh toán' THEN SET new_state = 2;
+        WHEN 'Đã giao cho đơn vị vận chuyển' THEN SET new_state = 3;
+        WHEN 'Đã nhận được hàng' THEN SET new_state = 4;
+        WHEN 'Đánh giá' THEN SET new_state = 5;
+    END CASE;
+
+    -- Không cho giảm trạng thái hoặc nhảy cóc
+    IF new_state < old_state OR new_state > old_state + 1 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Trạng thái đơn hàng phải được cập nhật tuần tự!';
+    END IF;
+
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
 CREATE TRIGGER trg_set_ngay_giao
 BEFORE UPDATE ON DonHang
 FOR EACH ROW
