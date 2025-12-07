@@ -460,7 +460,7 @@ BEGIN
     IF EXISTS (SELECT 1 FROM NguoiDung WHERE CCCD = p_CCCD AND IsBuyer = 1) THEN
         SELECT COALESCE(SUM(TongGia),0) INTO v_total
         FROM DonHang
-        WHERE CCCD = p_CCCD AND TrangThaiDonHang IN ('Đã nhận được hàng', 'Đánh giá');
+        WHERE CCCD = p_CCCD AND TrangThaiDonHang = 'Đã nhận được hàng';
 
         UPDATE NguoiDung
         SET CapDoMuaHang = CASE
