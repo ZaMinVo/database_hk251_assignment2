@@ -38,7 +38,7 @@ CREATE TABLE NguoiDung (
     IsBuyer TINYINT(1) NOT NULL DEFAULT 0,
     ThuNhap INT DEFAULT NULL,
     TrangThai ENUM('active', 'inactive', 'locked') DEFAULT 'active',
-    CapDoMuaHang ENUM('Đồng', 'Bạc', 'Vàng', 'Kim Cương') DEFAULT NULL,
+    CapDoMuaHang ENUM('Đồng', 'Bạc', 'Vàng', 'Kim Cương') DEFAULT 'Đồng',
     PRIMARY KEY (CCCD),
     UNIQUE KEY uniq_cccd (CCCD),
     UNIQUE KEY uniq_sdt (SoDienThoaiXacMinh),
@@ -447,5 +447,47 @@ CREATE TABLE ApDungVoucher (
         ON DELETE RESTRICT
         ON UPDATE RESTRICT
 );
+
+DELIMITER $$
+
+-- Procedure cập nhật cấp độ mua hàng
+DROP PROCEDURE IF EXISTS sp_update_capdo_mua_hang$$
+CREATE PROCEDURE sp_update_capdo_mua_hang(IN p_CCCD VARCHAR(12))
+BEGIN
+    DECLARE v_total INT;
+
+    SELECT COALESCE(SUM(TongGia),0) INTO v_total
+    FROM DonHang
+    WHERE CCCD = p_CCCD;
+
+    UPDATE NguoiDung
+    SET CapDoMuaHang = CASE
+        WHEN v_total >= 5000000 THEN 'Kim Cương'
+        WHEN v_total >= 3000000 THEN 'Vàng'
+        WHEN v_total >= 1000000 THEN 'Bạc'
+        ELSE 'Đồng'
+    END
+    WHERE CCCD = p_CCCD;
+END$$
+
+-- Trigger AFTER INSERT
+DROP TRIGGER IF EXISTS trg_update_capdo_insert$$
+CREATE TRIGGER trg_update_capdo_insert
+AFTER INSERT ON DonHang
+FOR EACH ROW
+BEGIN
+    CALL sp_update_capdo_mua_hang(NEW.CCCD);
+END$$
+
+-- Trigger AFTER UPDATE
+DROP TRIGGER IF EXISTS trg_update_capdo_update$$
+CREATE TRIGGER trg_update_capdo_update
+AFTER UPDATE ON DonHang
+FOR EACH ROW
+BEGIN
+    CALL sp_update_capdo_mua_hang(NEW.CCCD);
+END$$
+
+DELIMITER ;
 
 SET FOREIGN_KEY_CHECKS = 1;
