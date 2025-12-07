@@ -38,7 +38,7 @@ CREATE TABLE NguoiDung (
     IsBuyer TINYINT(1) NOT NULL DEFAULT 0,
     ThuNhap INT DEFAULT NULL,
     TrangThai ENUM('active', 'inactive', 'locked') DEFAULT 'active',
-    CapDoMuaHang ENUM('Đồng', 'Bạc', 'Vàng', 'Kim Cương') DEFAULT 'Đồng',
+    CapDoMuaHang ENUM('Đồng', 'Bạc', 'Vàng', 'Kim Cương') DEFAULT NULL,
     PRIMARY KEY (CCCD),
     UNIQUE KEY uniq_cccd (CCCD),
     UNIQUE KEY uniq_sdt (SoDienThoaiXacMinh),
@@ -456,18 +456,21 @@ CREATE PROCEDURE sp_update_capdo_mua_hang(IN p_CCCD VARCHAR(12))
 BEGIN
     DECLARE v_total INT;
 
-    SELECT COALESCE(SUM(TongGia),0) INTO v_total
-    FROM DonHang
-    WHERE CCCD = p_CCCD;
+    -- Chỉ tính tổng giá nếu người này là buyer
+    IF EXISTS (SELECT 1 FROM NguoiDung WHERE CCCD = p_CCCD AND IsBuyer = 1) THEN
+        SELECT COALESCE(SUM(TongGia),0) INTO v_total
+        FROM DonHang
+        WHERE CCCD = p_CCCD;
 
-    UPDATE NguoiDung
-    SET CapDoMuaHang = CASE
-        WHEN v_total >= 5000000 THEN 'Kim Cương'
-        WHEN v_total >= 3000000 THEN 'Vàng'
-        WHEN v_total >= 1000000 THEN 'Bạc'
-        ELSE 'Đồng'
-    END
-    WHERE CCCD = p_CCCD;
+        UPDATE NguoiDung
+        SET CapDoMuaHang = CASE
+            WHEN v_total >= 5000000 THEN 'Kim Cương'
+            WHEN v_total >= 3000000 THEN 'Vàng'
+            WHEN v_total >= 1500000 THEN 'Bạc'
+            ELSE 'Đồng'
+        END
+        WHERE CCCD = p_CCCD AND IsBuyer = 1;
+    END IF;
 END$$
 
 -- Trigger AFTER INSERT
